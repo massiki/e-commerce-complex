@@ -37,6 +37,7 @@
   </div>
 
   <script src="{{ asset('admin/js/jquery.min.js') }}"></script>
+  @stack('scripts')
   <script src="{{ asset('admin/js/bootstrap.min.js') }}"></script>
   <script src="{{ asset('admin/js/bootstrap-select.min.js') }}"></script>
   <script src="{{ asset('admin/js/sweetalert.min.js') }}"></script>

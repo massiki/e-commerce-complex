@@ -1,6 +1,6 @@
 <div class="section-menu-left">
   <div class="box-logo">
-    <a href="{{ asset('admin/index.html') }}" id="site-logo-inner">
+    <a href="#" id="site-logo-inner">
       <img class="" id="logo_header" alt="" src="{{ asset('admin/images/logo/logo.png') }}"
         data-light="{{ asset('admin/images/logo/logo.png') }}" data-dark="{{ asset('admin/images/logo/logo.png') }}">
     </a>
@@ -13,7 +13,7 @@
       <div class="center-heading">Main Home</div>
       <ul class="menu-list">
         <li class="menu-item">
-          <a href="{{ asset('admin/index.html') }}" class="">
+          <a href="{{ route('admin.dashboard') }}" class="">
             <div class="icon"><i class="icon-grid"></i></div>
             <div class="text">Dashboard</div>
           </a>
@@ -40,23 +40,11 @@
             </li>
           </ul>
         </li>
-        <li class="menu-item has-children">
-          <a href="javascript:void(0);" class="menu-item-button">
+        <li class="menu-item @if (request()->routeIs('admin.brands.*')) active @endif">
+          <a href="{{ route('admin.brands.index') }}" class="">
             <div class="icon"><i class="icon-layers"></i></div>
             <div class="text">Brand</div>
           </a>
-          <ul class="sub-menu">
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/add-brand.html') }}" class="">
-                <div class="text">New Brand</div>
-              </a>
-            </li>
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/brands.html') }}" class="">
-                <div class="text">Brands</div>
-              </a>
-            </li>
-          </ul>
         </li>
         <li class="menu-item has-children">
           <a href="javascript:void(0);" class="menu-item-button">

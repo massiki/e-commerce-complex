@@ -1,18 +1,24 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\BrandController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
+
+    // brands
+    Route::resource('brands', BrandController::class)->except(['show'])->names('brands');
 });
 
+// customer
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer.')->group(function () {
     Route::get('dashboard', function () {
         return view('customer.dashboard.index');
