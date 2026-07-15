@@ -46,23 +46,11 @@
             <div class="text">Brand</div>
           </a>
         </li>
-        <li class="menu-item has-children">
-          <a href="javascript:void(0);" class="menu-item-button">
+        <li class="menu-item @if (request()->routeIs('admin.categories.*')) active @endif">
+          <a href="{{ route('admin.categories.index') }}" class="">
             <div class="icon"><i class="icon-layers"></i></div>
             <div class="text">Category</div>
           </a>
-          <ul class="sub-menu">
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/add-category.html') }}" class="">
-                <div class="text">New Category</div>
-              </a>
-            </li>
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/categories.html') }}" class="">
-                <div class="text">Categories</div>
-              </a>
-            </li>
-          </ul>
         </li>
 
         <li class="menu-item has-children">

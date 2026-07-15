@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,6 +17,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // brands
     Route::resource('brands', BrandController::class)->except(['show'])->names('brands');
+
+    // categories
+    Route::resource('categories', CategoryController::class)->except(['show'])->names('categories');
 });
 
 // customer
