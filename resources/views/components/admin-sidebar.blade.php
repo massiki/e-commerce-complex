@@ -121,6 +121,17 @@
             <div class="text">Settings</div>
           </a>
         </li>
+
+        <li class="menu-item">
+          <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit"
+              class="flex items-center justify-start gap-2 w-full px-4 py-3 bg-transparent border-0 cursor-pointer">
+              <div class="icon"><i class="icon-log-out"></i></div>
+              <div class="text">Log Out</div>
+            </button>
+          </form>
+        </li>
       </ul>
     </div>
   </div>

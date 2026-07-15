@@ -260,12 +260,16 @@
               </a>
             </li>
             <li>
-              <a href="{{ asset('admin/login.html') }}" class="user-item">
-                <div class="icon">
-                  <i class="icon-log-out"></i>
-                </div>
-                <div class="body-title-2">Log out</div>
-              </a>
+              <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit"
+                  class="user-item w-full text-left bg-transparent border-0 p-0 m-0 hover:bg-gray-100 flex items-center">
+                  <div class="icon">
+                    <i class="icon-log-out"></i>
+                  </div>
+                  <div class="body-title-2 text-start">Log out</div>
+                </button>
+              </form>
             </li>
           </ul>
         </div>
