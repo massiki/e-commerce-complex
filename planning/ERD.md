@@ -195,6 +195,16 @@ erDiagram
         string activity
         timestamp created_at
     }
+
+    SLIDERS {
+        bigint id PK
+        string title_small
+        string title
+        string subtitle
+        string button_text
+        string button_link
+        string image
+    }
 ```
 
 
