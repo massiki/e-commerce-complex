@@ -4,6 +4,4 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Slider extends Model
-{
-}
+class Slider extends Model {}
