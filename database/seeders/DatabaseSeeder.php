@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Discount;
 use App\Models\Product;
 use App\Models\Role;
 use App\Models\User;
@@ -46,5 +47,10 @@ class DatabaseSeeder extends Seeder
         }
 
         Product::factory(50)->create();
+
+        $products = Product::inRandomOrder()->take(30)->get();
+        foreach ($products as $product) {
+            Discount::factory()->create(['product_id' => $product->id]);
+        }
     }
 }

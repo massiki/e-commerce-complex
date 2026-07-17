@@ -74,6 +74,7 @@ erDiagram
         string slug
         text description
         decimal price
+        enum featured
         integer stock
         decimal rating
     }
