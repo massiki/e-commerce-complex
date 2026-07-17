@@ -22,23 +22,11 @@
     </div>
     <div class="center-item">
       <ul class="menu-list">
-        <li class="menu-item has-children">
-          <a href="javascript:void(0);" class="menu-item-button">
+        <li class="menu-item @if (request()->routeIs('admin.products.*')) active @endif">
+          <a href="{{ route('admin.products.index') }}" class="">
             <div class="icon"><i class="icon-shopping-cart"></i></div>
             <div class="text">Products</div>
           </a>
-          <ul class="sub-menu">
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/add-product.html') }}" class="">
-                <div class="text">Add Product</div>
-              </a>
-            </li>
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/products.html') }}" class="">
-                <div class="text">Products</div>
-              </a>
-            </li>
-          </ul>
         </li>
         <li class="menu-item @if (request()->routeIs('admin.brands.*')) active @endif">
           <a href="{{ route('admin.brands.index') }}" class="">
