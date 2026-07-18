@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
@@ -42,6 +43,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // activities
     Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
+
+    // orders
+    Route::resource('orders', OrderController::class)->names('orders');
 
     // sliders
     Route::resource('sliders', SliderController::class)->except(['show'])->names('sliders');
