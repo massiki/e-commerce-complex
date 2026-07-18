@@ -65,10 +65,10 @@
             <div class="text">Slider</div>
           </a>
         </li>
-        <li class="menu-item">
-          <a href="{{ asset('admin/coupons.html') }}" class="">
+        <li class="menu-item @if (request()->routeIs('admin.coupons.*')) active @endif">
+          <a href="{{ route('admin.coupons.index') }}" class="">
             <div class="icon"><i class="icon-grid"></i></div>
-            <div class="text">Coupns</div>
+            <div class="text">Coupons</div>
           </a>
         </li>
 
