@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('sliders', function (Blueprint $table) {
             $table->id();
-            $table->string('title_small')->nullable();
-            $table->string('title')->nullable();
-            $table->string('subtitle')->nullable();
-            $table->string('button_text')->nullable();
-            $table->string('button_link')->nullable();
-            $table->string('image')->nullable();
+            $table->string('title_small');
+            $table->string('title');
+            $table->string('subtitle');
+            $table->string('button_text');
+            $table->string('button_link');
+            $table->string('image');
             $table->timestamps();
         });
     }

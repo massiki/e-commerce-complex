@@ -59,8 +59,8 @@
             </li>
           </ul>
         </li>
-        <li class="menu-item">
-          <a href="{{ asset('admin/slider.html') }}" class="">
+        <li class="menu-item @if (request()->routeIs('admin.sliders.*')) active @endif">
+          <a href="{{ route('admin.sliders.index') }}" class="">
             <div class="icon"><i class="icon-image"></i></div>
             <div class="text">Slider</div>
           </a>
