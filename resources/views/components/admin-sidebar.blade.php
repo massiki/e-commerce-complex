@@ -41,23 +41,11 @@
           </a>
         </li>
 
-        <li class="menu-item has-children">
-          <a href="javascript:void(0);" class="menu-item-button">
+        <li class="menu-item @if (request()->routeIs('admin.orders.*')) active @endif">
+          <a href="{{ route('admin.orders.index') }}" class="">
             <div class="icon"><i class="icon-file-plus"></i></div>
-            <div class="text">Order</div>
+            <div class="text">Orders</div>
           </a>
-          <ul class="sub-menu">
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/orders.html') }}" class="">
-                <div class="text">Orders</div>
-              </a>
-            </li>
-            <li class="sub-menu-item">
-              <a href="{{ asset('admin/order-tracking.html') }}" class="">
-                <div class="text">Order tracking</div>
-              </a>
-            </li>
-          </ul>
         </li>
         <li class="menu-item @if (request()->routeIs('admin.sliders.*')) active @endif">
           <a href="{{ route('admin.sliders.index') }}" class="">

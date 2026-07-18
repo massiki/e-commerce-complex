@@ -1,6 +1,6 @@
 # Progress Proyek E-Commerce Complex
 
-**Terakhir diperbarui:** 15 Juli 2026
+**Terakhir diperbarui:** 18 Juli 2026
 
 ---
 
@@ -8,13 +8,13 @@
 
 | Komponen | Progress |
 |----------|----------|
-| Database Schema | ✅ ~90% |
-| Models | ⬜ ~50% |
-| Controllers | ⬜ ~15% |
-| Views (Blade) | ⬜ ~50% |
-| Routes | ⬜ ~15% |
-| Tests | ⬜ ~10% |
-| **Estimasi Keseluruhan** | **⬜ ~30%** |
+| Database Schema | ✅ ~100% (23 migrations) |
+| Models | ✅ ~100% (20 models) |
+| Controllers | ⬜ ~55% (9 admin: 5 complete, 4 partial; 0 customer) |
+| Views (Blade) | ⬜ ~60% (22 admin + 13 customer = 35 files) |
+| Routes | ⬜ ~55% (10 admin groups, 2 customer closures) |
+| Tests | ⬜ ~10% (11 files, semua Breeze default) |
+| **Estimasi Keseluruhan** | **⬜ ~40%** |
 
 ---
 
@@ -25,70 +25,91 @@
 - Role-based routing (`role:admin`, `role:customer`)
 - `RoleMiddleware` — registered as `role` alias in `bootstrap/app.php`
 - Login redirect by role (`AuthenticatedSessionController`)
+- 2 roles seeded: admin & customer
+- 2 users seeded: admin@gmail.com & customer@gmail.com
 
 ### Database Schema (23 Migration Files)
 | # | File | Table |
 |---|------|-------|
-| 1 | `0001_01_01_000000_create_users_table.php` | `users`, `password_reset_tokens`, `sessions` |
-| 2 | `0001_01_01_000001_create_cache_table.php` | `cache`, `cache_locks` |
-| 3 | `0001_01_01_000002_create_jobs_table.php` | `jobs`, `job_batches`, `failed_jobs` |
-| 4 | `0001_01_01_000003_create_roles_table.php` | `roles` |
-| 5 | `0001_01_01_000004_add_role_id_and_phone_to_users_table.php` | **Alter** `users` (+ `role_id`, `phone`) |
-| 6 | `0001_01_01_000005_create_categories_table.php` | `categories` |
-| 7 | `0001_01_01_000006_create_brands_table.php` | `brands` |
-| 8 | `0001_01_01_000007_create_sliders_table.php` | `sliders` |
-| 9 | `0001_01_01_000008_create_coupons_table.php` | `coupons` |
-| 10 | `0001_01_01_000009_create_products_table.php` | `products` |
-| 11 | `0001_01_01_000010_create_product_images_table.php` | `product_images` |
-| 12 | `0001_01_01_000011_create_discounts_table.php` | `discounts` |
-| 13 | `0001_01_01_000012_create_addresses_table.php` | `addresses` |
-| 14 | `0001_01_01_000013_create_carts_table.php` | `carts` |
-| 15 | `0001_01_01_000014_create_wishlists_table.php` | `wishlists` |
-| 16 | `0001_01_01_000015_create_cart_items_table.php` | `cart_items` |
-| 17 | `0001_01_01_000016_create_wishlist_items_table.php` | `wishlist_items` |
-| 18 | `0001_01_01_000017_create_coupon_usages_table.php` | `coupon_usages` |
-| 19 | `0001_01_01_000018_create_notifications_table.php` | `notifications` |
-| 20 | `0001_01_01_000019_create_activity_logs_table.php` | `activity_logs` |
-| 21 | `0001_01_01_000020_create_orders_table.php` | `orders` |
-| 22 | `0001_01_01_000021_create_order_items_table.php` | `order_items` |
-| 23 | `0001_01_01_000022_create_reviews_table.php` | `reviews` |
+| 1 | `create_users_table` | `users`, `password_reset_tokens`, `sessions` |
+| 2 | `create_cache_table` | `cache`, `cache_locks` |
+| 3 | `create_jobs_table` | `jobs`, `job_batches`, `failed_jobs` |
+| 4 | `create_roles_table` | `roles` |
+| 5 | `add_role_id_and_phone_to_users_table` | **Alter** `users` (+ `role_id`, `phone`) |
+| 6 | `create_categories_table` | `categories` |
+| 7 | `create_brands_table` | `brands` |
+| 8 | `create_sliders_table` | `sliders` |
+| 9 | `create_coupons_table` | `coupons` |
+| 10 | `create_products_table` | `products` |
+| 11 | `create_product_images_table` | `product_images` |
+| 12 | `create_discounts_table` | `discounts` |
+| 13 | `create_addresses_table` | `addresses` |
+| 14 | `create_carts_table` | `carts` |
+| 15 | `create_wishlists_table` | `wishlists` |
+| 16 | `create_cart_items_table` | `cart_items` |
+| 17 | `create_wishlist_items_table` | `wishlist_items` |
+| 18 | `create_coupon_usages_table` | `coupon_usages` |
+| 19 | `create_notifications_table` | `notifications` |
+| 20 | `create_activity_logs_table` | `activity_logs` |
+| 21 | `create_orders_table` | `orders` |
+| 22 | `create_order_items_table` | `order_items` |
+| 23 | `create_reviews_table` | `reviews` |
 
 ### Seeders
-- `DatabaseSeeder` — seeds: 2 roles (admin, customer), 2 users (admin@gmail.com, customer@gmail.com), 5 brands, 5 categories, 50 products
+- `DatabaseSeeder` — seeds: 2 roles, 2 users, 5 brands, 5 categories, 50 products
 - Factories: `UserFactory`, `CategoryFactory`, `BrandFactory`, `ProductFactory`
 
-### Admin CRUD
-- **Brand CRUD** — Controller (`index`, `create`, `store`, `edit`, `update`, `destroy`) + Views (`index`, `create`, `edit`) + Routes ✅
-- **Category CRUD** — Controller (`index`, `create`, `store`, `edit`, `update`, `destroy`) + Views (`index`, `create`, `edit`) + Routes ✅
+### Models (20 total)
+| Status | Models |
+|--------|--------|
+| ✅ Dengan `$fillable` / `$guarded` | User, Brand, Category, Coupon, Slider, Product, ProductImage, Discount, Review, ActivityLog |
+| ⬜ Tanpa `$fillable` / `$guarded` (rentan mass assignment) | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role |
+
+### Admin CRUD — Complete (Controller + Views + Routes + ActivityLog)
+| Fitur | Controller | Index | Create | Edit | Store | Update | Destroy | ActivityLog |
+|-------|-----------|-------|--------|------|-------|--------|---------|-------------|
+| **Brand** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
+| **Category** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
+| **Coupon** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
+| **Product** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
+| **Slider** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
+
+### Routes (web.php)
+- 6 resource routes di admin: brands, categories, products, coupons, sliders (semua `except(['show'])`)
+- 3 GET-only routes: customers, reviews, activities
+- 1 index+update route: settings
+- 1 guest route: products (static view)
 
 ---
 
-## ⬜ Sebagian (Views Ada, Controller/Routes Belum)
+## ⬜ Sebagian (Controller Parsial, View Terbatas)
 
-### Admin Area
+### Admin — Controller hanya index saja
+| Fitur | Controller | View | Route | ActivityLog |
+|-------|-----------|------|-------|-------------|
+| Customers | `index()` saja | `index.blade.php` | GET only | ❌ |
+| Reviews | `index()` saja | `index.blade.php` | GET only | ❌ |
+| Activities | `index()` saja | `index.blade.php` | GET only | ❌ (read-only) |
+| Settings | `index()` + `update()` | `index.blade.php` | GET + POST | ❌ |
+
+### Admin — View ada tapi Controller belum
 | Fitur | View Files | Controller | Routes |
 |-------|-----------|------------|--------|
-| Products | `index`, `create`, `edit` | ❌ | ❌ |
-| Coupons | `index`, `create`, `edit` | ❌ | ❌ |
-| Orders | `index`, `show` | ❌ | ❌ |
-| Customers | `index` | ❌ | ❌ |
-| Reviews | `index` | ❌ | ❌ |
-| Activities | `index` | ❌ | ❌ |
-| Settings | `index` | ❌ | ❌ |
+| Orders | `index.blade.php`, `show.blade.php` | ❌ **OrderController belum dibuat** | ❌ |
 
-### Customer Area
+### Customer Area — Semua masih view statis, belum ada controller
 | Fitur | View Files | Controller | Routes |
 |-------|-----------|------------|--------|
 | Home | `customer/home.blade.php` | ❌ | ❌ |
-| Product Listing | `customer/product.blade.php` | ❌ | Route points to static view |
+| Product Listing | `customer/product.blade.php` | ❌ | Closure static view |
 | Product Detail | `customer/product-detail.blade.php` | ❌ | ❌ |
 | Carts | `customer/carts.blade.php` | ❌ | ❌ |
 | Wishlists | `customer/wishlists.blade.php` | ❌ | ❌ |
-| Dashboard | `customer/dashboard/index.blade.php` | ❌ | Route points to static view |
+| Dashboard | `customer/dashboard/index.blade.php` | ❌ | Closure static view |
 | Account | `customer/dashboard/account.blade.php` | ❌ | ❌ |
 | History | `customer/dashboard/history.blade.php` | ❌ | ❌ |
-| Orders | `customer/dashboard/orders/index, show` | ❌ | ❌ |
-| Addresses | `customer/dashboard/addresses/index, create, edit` | ❌ | ❌ |
+| Orders (customer) | `dashboard/orders/index.blade.php`, `show.blade.php` | ❌ | ❌ |
+| Addresses | `dashboard/addresses/index.blade.php`, `create.blade.php`, `edit.blade.php` | ❌ | ❌ |
 
 ---
 
@@ -96,17 +117,18 @@
 
 | Fitur | Prioritas | Keterangan |
 |-------|-----------|------------|
+| Order Management (Admin) | 🔴 Tinggi | Controller belum ada, padahal views siap |
 | Checkout (Midtrans) | 🔴 Tinggi | Belum ada package `midtrans/midtrans-php`, belum ada logika payment |
 | Checkout (COD) | 🔴 Tinggi | - |
 | Discount Scheduler | 🟡 Sedang | Butuh Laravel Task Scheduler + console command |
 | Dashboard Analytics | 🟡 Sedang | View statis, belum connect ke database |
 | PDF Invoice | 🟡 Sedang | Butuh `barryvdh/laravel-dompdf` |
 | Notification System | 🟡 Sedang | Belum ada `app/Notifications/` |
+| Customer Controllers | 🟡 Sedang | 0 controller customer sama sekali |
 | Auto Rating Calculation | 🟢 Ringan | - |
 | Low Stock Warning | 🟢 Ringan | - |
 | Soft Delete Product | 🟢 Ringan | - |
 | Activity Log Automation | 🟢 Ringan | Masih manual di controller |
-| Slider Management | 🟢 Ringan | Model & migration ada, sisanya belum |
 
 ---
 
@@ -114,11 +136,14 @@
 
 | Issue | Detail | Severity |
 |-------|--------|----------|
-| Register tidak assign role | User baru daftar dapat `role_id = null` | Tinggi |
-| Banyak model tanpa `$fillable` | Product, Coupon, Slider, dll — mass assignment error | Tinggi |
-| Route profile di-comment | `routes/web.php` line 36-40 | Sedang |
-| Dashboard masih statis | Belum ada query real dari database | Sedang |
-| Activity log manual | Belum pakai event/listener atau observer | Rendah |
+| Register tidak assign role | User baru daftar dapat `role_id = null` | 🔴 Tinggi |
+| 10 model tanpa `$fillable`/`$guarded` | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role — rawan mass assignment | 🔴 Tinggi |
+| Route profile di-comment | `routes/web.php` line 65-69 | 🟡 Sedang |
+| Dashboard masih statis | Belum ada query real dari database | 🟡 Sedang |
+| Activity log manual | Belum pakai event/listener atau observer | 🟡 Sedang |
+| **OrderController tidak ada** | Views sudah siap, tapi controller & routes belum dibuat | 🔴 Tinggi |
+| **0 customer controller** | Seluruh frontend customer masih pakai closure/view statis | 🔴 Tinggi |
+| Inconsistency `Auth::user()->id` vs `Auth::id()` | Brand/Category/Slider pakai `Auth::user()->id`, Coupon/Product pakai `Auth::id()` | 🟢 Ringan |
 
 ---
 
@@ -126,20 +151,17 @@
 
 | Urutan | Fitur | Alasan |
 |--------|-------|--------|
-| 1 | **Product CRUD** | Core bisnis, views sudah siap, tinggal controller + routes |
-| 2 | **Checkout (COD → Midtrans)** | Alur transaksi utama, prioritas tinggi |
-| 3 | **Order Management** | Admin harus bisa memproses pesanan |
-| 4 | **Coupon System** | Views sudah ada, integrasi dengan checkout |
-| 5 | **Dashboard Analytics** | Query real dari database |
-| 6 | **Discount Scheduler** | Otomatisasi diskon |
-| 7 | **Customer Addresses** | Syarat checkout |
-| 8 | **Reviews & Rating** | Setelah order selesai |
-| 9 | **Notification System** | Notifikasi transaksi |
-| 10 | **PDF Invoice** | Setelah payment |
-| 11 | **Activity Log Automation** | Event/listener |
-| 12 | **Low Stock Warning** | Monitoring stok |
-| 13 | **Slider Management** | Frontend hero section |
-| 14 | **Soft Delete Product** | Data safety |
+| 1 | **Order Management (Admin)** | Views siap, tinggal controller + routes + update status order |
+| 2 | **Checkout (COD → Midtrans)** | Alur transaksi utama |
+| 3 | **Customer Controllers** | Landing page, product listing, cart, wishlist, dll |
+| 4 | **Dashboard Analytics** | Query real dari database untuk admin & customer |
+| 5 | **Discount Scheduler** | Otomatisasi diskon |
+| 6 | **Reviews & Rating** | Setelah order selesai |
+| 7 | **Notification System** | Notifikasi transaksi |
+| 8 | **PDF Invoice** | Setelah payment |
+| 9 | **Activity Log Automation** | Event/listener |
+| 10 | **Low Stock Warning** | Monitoring stok |
+| 11 | **Soft Delete Product** | Data safety |
 
 ---
 
@@ -149,9 +171,10 @@
 - [x] Login
 - [x] CRUD Category
 - [x] CRUD Brand
+- [x] CRUD Coupon
+- [x] CRUD Product (+ Multiple Images, Stock Management)
+- [x] CRUD Slider
 - [ ] Dashboard (Revenue, Orders, Customers, Products, Monthly Sales, Best Selling, Low Stock)
-- [ ] CRUD Product (+ Multiple Images, Stock Management, Soft Delete & Restore)
-- [ ] CRUD Coupon (Minimum Purchase, Expiration Date)
 - [ ] Discount Scheduler (Start/End, Auto Return Normal Price)
 - [ ] Order Management (Pending → Paid → Processing → Shipped → Completed/Cancelled)
 - [ ] Customer Management (List, Detail, Purchase History)
@@ -198,13 +221,13 @@
 ## Total File Summary
 
 ```
-app/Models/              → 20 models (banyak minimal tanpa $fillable)
-app/Http/Controllers/    → 13 controllers (hanya 2 admin: Brand, Category)
-resources/views/         → 62 Blade files
+app/Models/              → 20 models (10 tanpa $fillable)
+app/Http/Controllers/    → 14 controllers (5 admin CRUD complete, 4 admin partial, 0 customer)
+resources/views/         → 35 Blade files (22 admin, 13 customer)
 database/migrations/     → 23 migrations
-database/seeders/        → 1 seeder
+database/seeders/        → 1 seeder (DatabaseSeeder)
 database/factories/      → 4 factories
 routes/                  → web.php, auth.php, console.php
-tests/                   → 9 test files (semua Breeze default)
+tests/                   → 11 test files (semua Breeze default)
 planning/                → 6 dokumen (BRIEF, ERD, USE_CASE, SEQUENCE, ACTIVITY, progres)
 ```
