@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,6 +25,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // products
     Route::resource('products', ProductController::class)->except(['show'])->names('products');
+
+    // coupons
+    Route::resource('coupons', CouponController::class)->except(['show'])->names('coupons');
 });
 
 // customer
@@ -43,4 +47,4 @@ Route::get('products', function () {
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

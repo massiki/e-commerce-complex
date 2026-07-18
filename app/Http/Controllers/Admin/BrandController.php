@@ -23,6 +23,7 @@ class BrandController extends Controller
             })
             ->latest()
             ->get();
+
         return view('admin.brands.index', compact('brands'));
     }
 
@@ -48,7 +49,7 @@ class BrandController extends Controller
         $originalSlug = $slug;
         $counter = 1;
         while (Brand::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
+            $slug = $originalSlug.'-'.$counter++;
         }
 
         $imagePath = null;
@@ -100,7 +101,7 @@ class BrandController extends Controller
         $originalSlug = $slug;
         $counter = 1;
         while (Brand::where('slug', $slug)->where('id', '!=', $brand->id)->exists()) {
-            $slug = $originalSlug . '-' . $counter++;
+            $slug = $originalSlug.'-'.$counter++;
         }
 
         $imagePath = $brand->image;
