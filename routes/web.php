@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ReviewController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +32,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // coupons
     Route::resource('coupons', CouponController::class)->except(['show'])->names('coupons');
+
+    // user customers
+    Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+
+    // reviews
+    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+
+    // activities
+    Route::get('activities', [ActivityController::class, 'index'])->name('activities.index');
+
+    // settings
+    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
 });
 
 // customer

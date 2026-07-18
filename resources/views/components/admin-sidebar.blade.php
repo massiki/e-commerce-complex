@@ -72,15 +72,29 @@
           </a>
         </li>
 
-        <li class="menu-item">
-          <a href="{{ asset('admin/users.html') }}" class="">
+        <li class="menu-item @if (request()->routeIs('admin.reviews.*')) active @endif">
+          <a href="{{ route('admin.reviews.index') }}" class="">
+            <div class="icon"><i class="icon-star"></i></div>
+            <div class="text">Reviews</div>
+          </a>
+        </li>
+
+        <li class="menu-item @if (request()->routeIs('admin.activities.*')) active @endif">
+          <a href="{{ route('admin.activities.index') }}" class="">
+            <div class="icon"><i class="icon-file-text"></i></div>
+            <div class="text">Activity</div>
+          </a>
+        </li>
+
+        <li class="menu-item @if (request()->routeIs('admin.customers.*')) active @endif">
+          <a href="{{ route('admin.customers.index') }}" class="">
             <div class="icon"><i class="icon-user"></i></div>
             <div class="text">User</div>
           </a>
         </li>
 
-        <li class="menu-item">
-          <a href="{{ asset('admin/settings.html') }}" class="">
+        <li class="menu-item @if (request()->routeIs('admin.settings.*')) active @endif">
+          <a href="{{ route('admin.settings.index') }}" class="">
             <div class="icon"><i class="icon-settings"></i></div>
             <div class="text">Settings</div>
           </a>
