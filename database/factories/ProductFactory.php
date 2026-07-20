@@ -25,10 +25,9 @@ class ProductFactory extends Factory
             'name' => $name,
             'slug' => Str::slug($name),
             'description' => fake()->paragraphs(3, true),
-            'price' => fake()->randomFloat(2, 10000, 10000000),
+            'price' => fake()->randomFloat(0, 10000, 10000000),
             'featured' => fake()->boolean(),
             'stock' => fake()->numberBetween(0, 100),
-            'rating' => fake()->randomFloat(1, 1, 5),
         ];
     }
 }

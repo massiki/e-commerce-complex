@@ -30,7 +30,7 @@ class SettingController extends Controller
         ]);
 
         if ($request->filled('old_password')) {
-            if (!Hash::check($request->old_password, $user->password)) {
+            if (! Hash::check($request->old_password, $user->password)) {
                 return back()->withErrors(['old_password' => 'The old password does not match.']);
             }
         }

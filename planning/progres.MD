@@ -1,6 +1,6 @@
 # Progress Proyek E-Commerce Complex
 
-**Terakhir diperbarui:** 18 Juli 2026
+**Terakhir diperbarui:** 19 Juli 2026
 
 ---
 
@@ -9,12 +9,12 @@
 | Komponen | Progress |
 |----------|----------|
 | Database Schema | ✅ ~100% (23 migrations) |
-| Models | ✅ ~100% (20 models) |
-| Controllers | ⬜ ~55% (9 admin: 5 complete, 4 partial; 0 customer) |
-| Views (Blade) | ⬜ ~60% (22 admin + 13 customer = 35 files) |
-| Routes | ⬜ ~55% (10 admin groups, 2 customer closures) |
+| Models | ✅ ~100% (20 models, 50% pakai fillable/guarded) |
+| Controllers | ⬜ ~60% (10 admin: 5 complete, 5 partial; 1 customer) |
+| Views (Blade) | ⬜ ~65% (71 file: 22 admin + 13 customer + 19 components + 5 layouts + 6 auth + 6 other) |
+| Routes | ⬜ ~65% (11 admin groups, 1 customer route + 1 closure) |
 | Tests | ⬜ ~10% (11 files, semua Breeze default) |
-| **Estimasi Keseluruhan** | **⬜ ~40%** |
+| **Estimasi Keseluruhan** | **⬜ ~43%** |
 
 ---
 
@@ -57,12 +57,12 @@
 
 ### Seeders
 - `DatabaseSeeder` — seeds: 2 roles, 2 users, 5 brands, 5 categories, 50 products
-- Factories: `UserFactory`, `CategoryFactory`, `BrandFactory`, `ProductFactory`
+- Factories: `UserFactory`, `CategoryFactory`, `BrandFactory`, `ProductFactory`, `DiscountFactory`
 
 ### Models (20 total)
 | Status | Models |
 |--------|--------|
-| ✅ Dengan `$fillable` / `$guarded` | User, Brand, Category, Coupon, Slider, Product, ProductImage, Discount, Review, ActivityLog |
+| ✅ Dengan `$fillable` / `$guarded` | User (`#[Fillable]`), Brand, Category, Coupon, Slider, Product (`#[Guarded([])]`), ProductImage (`#[Guarded([])]`), Discount (`#[Guarded([])]`), Review (`#[Guarded([])]`), ActivityLog |
 | ⬜ Tanpa `$fillable` / `$guarded` (rentan mass assignment) | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role |
 
 ### Admin CRUD — Complete (Controller + Views + Routes + ActivityLog)
@@ -75,32 +75,30 @@
 | **Slider** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
 
 ### Routes (web.php)
-- 6 resource routes di admin: brands, categories, products, coupons, sliders (semua `except(['show'])`)
+- 7 resource routes di admin: brands, categories, products, coupons, sliders (semua `except(['show'])`), orders (FULL resource)
 - 3 GET-only routes: customers, reviews, activities
 - 1 index+update route: settings
+- 1 customer dashboard route: dashboard
+- 1 home route: `/` → `HomeController::index`
 - 1 guest route: products (static view)
 
 ---
 
 ## ⬜ Sebagian (Controller Parsial, View Terbatas)
 
-### Admin — Controller hanya index saja
+### Admin — Controller hanya index saja (atau parsial)
 | Fitur | Controller | View | Route | ActivityLog |
 |-------|-----------|------|-------|-------------|
 | Customers | `index()` saja | `index.blade.php` | GET only | ❌ |
 | Reviews | `index()` saja | `index.blade.php` | GET only | ❌ |
 | Activities | `index()` saja | `index.blade.php` | GET only | ❌ (read-only) |
 | Settings | `index()` + `update()` | `index.blade.php` | GET + POST | ❌ |
+| **Orders** | **`index()` saja** | **`index.blade.php`, `show.blade.php`** | **Full resource** (hanya index terisi) | ❌ |
 
-### Admin — View ada tapi Controller belum
+### Customer Area — Sebagian sudah ada controller
 | Fitur | View Files | Controller | Routes |
 |-------|-----------|------------|--------|
-| Orders | `index.blade.php`, `show.blade.php` | ❌ **OrderController belum dibuat** | ❌ |
-
-### Customer Area — Semua masih view statis, belum ada controller
-| Fitur | View Files | Controller | Routes |
-|-------|-----------|------------|--------|
-| Home | `customer/home.blade.php` | ❌ | ❌ |
+| **Home** | **`customer/home.blade.php`** | **✅ `HomeController::index()`** | **✅ `Route::get('/', ...)`** |
 | Product Listing | `customer/product.blade.php` | ❌ | Closure static view |
 | Product Detail | `customer/product-detail.blade.php` | ❌ | ❌ |
 | Carts | `customer/carts.blade.php` | ❌ | ❌ |
@@ -117,14 +115,14 @@
 
 | Fitur | Prioritas | Keterangan |
 |-------|-----------|------------|
-| Order Management (Admin) | 🔴 Tinggi | Controller belum ada, padahal views siap |
 | Checkout (Midtrans) | 🔴 Tinggi | Belum ada package `midtrans/midtrans-php`, belum ada logika payment |
 | Checkout (COD) | 🔴 Tinggi | - |
 | Discount Scheduler | 🟡 Sedang | Butuh Laravel Task Scheduler + console command |
 | Dashboard Analytics | 🟡 Sedang | View statis, belum connect ke database |
 | PDF Invoice | 🟡 Sedang | Butuh `barryvdh/laravel-dompdf` |
 | Notification System | 🟡 Sedang | Belum ada `app/Notifications/` |
-| Customer Controllers | 🟡 Sedang | 0 controller customer sama sekali |
+| Customer Controllers (8 fitur) | 🟡 Sedang | Baru HomeController, 8 fitur lainnya masih view statis |
+| Order `show/edit/update/destroy` | 🟡 Sedang | Controller cuma punya `index()` |
 | Auto Rating Calculation | 🟢 Ringan | - |
 | Low Stock Warning | 🟢 Ringan | - |
 | Soft Delete Product | 🟢 Ringan | - |
@@ -138,11 +136,11 @@
 |-------|--------|----------|
 | Register tidak assign role | User baru daftar dapat `role_id = null` | 🔴 Tinggi |
 | 10 model tanpa `$fillable`/`$guarded` | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role — rawan mass assignment | 🔴 Tinggi |
-| Route profile di-comment | `routes/web.php` line 65-69 | 🟡 Sedang |
+| Route profile di-comment | `routes/web.php` line 64-68 | 🟡 Sedang |
 | Dashboard masih statis | Belum ada query real dari database | 🟡 Sedang |
 | Activity log manual | Belum pakai event/listener atau observer | 🟡 Sedang |
-| **OrderController tidak ada** | Views sudah siap, tapi controller & routes belum dibuat | 🔴 Tinggi |
-| **0 customer controller** | Seluruh frontend customer masih pakai closure/view statis | 🔴 Tinggi |
+| **OrderController hanya index()** | Full resource route, tapi show/create/store/edit/update/destroy belum diimplementasi | 🟡 Sedang |
+| **Customer controller minim** | Hanya `HomeController::index()` yang aktif, 8 fitur lainnya masih closure/view statis | 🔴 Tinggi |
 | Inconsistency `Auth::user()->id` vs `Auth::id()` | Brand/Category/Slider pakai `Auth::user()->id`, Coupon/Product pakai `Auth::id()` | 🟢 Ringan |
 
 ---
@@ -151,7 +149,7 @@
 
 | Urutan | Fitur | Alasan |
 |--------|-------|--------|
-| 1 | **Order Management (Admin)** | Views siap, tinggal controller + routes + update status order |
+| 1 | **Order Management (Admin)** | Controller baru index(), perlu show + update status order + routes |
 | 2 | **Checkout (COD → Midtrans)** | Alur transaksi utama |
 | 3 | **Customer Controllers** | Landing page, product listing, cart, wishlist, dll |
 | 4 | **Dashboard Analytics** | Query real dari database untuk admin & customer |
@@ -184,8 +182,9 @@
 ### Customer
 - [x] Register
 - [x] Login
-- [ ] Dashboard (Total Orders, Spending, Wishlist, Notifications, Payment History)
-- [ ] Browse Products (Search, Filter, Detail)
+- [x] Home Page (Hero Slider, Categories, Hot Deals, Featured Products)
+- [/] Dashboard (Total Orders, Spending, Wishlist, Notifications, Payment History) — view statis
+- [/] Browse Products (Search, Filter, Detail) — view statis
 - [ ] Wishlist (Add, Remove)
 - [ ] Shopping Cart (Add, Update Qty, Remove)
 - [ ] Address Management (Rumah/Kantor/Kos — Recipient, Phone, Province, City, District, Postal Code, Full Address)
@@ -221,12 +220,12 @@
 ## Total File Summary
 
 ```
-app/Models/              → 20 models (10 tanpa $fillable)
-app/Http/Controllers/    → 14 controllers (5 admin CRUD complete, 4 admin partial, 0 customer)
-resources/views/         → 35 Blade files (22 admin, 13 customer)
+app/Models/              → 20 models (10 tanpa $fillable/guarded)
+app/Http/Controllers/    → 22 controllers (10 admin: 5 complete CRUD, 5 partial; 1 customer; 8 auth; 1 profile; 1 base; 1 home)
+resources/views/         → 71 Blade files (22 admin + 13 customer + 19 components + 5 layouts + 6 auth + 6 other)
 database/migrations/     → 23 migrations
 database/seeders/        → 1 seeder (DatabaseSeeder)
-database/factories/      → 4 factories
+database/factories/      → 5 factories (+ DiscountFactory)
 routes/                  → web.php, auth.php, console.php
 tests/                   → 11 test files (semua Breeze default)
 planning/                → 6 dokumen (BRIEF, ERD, USE_CASE, SEQUENCE, ACTIVITY, progres)

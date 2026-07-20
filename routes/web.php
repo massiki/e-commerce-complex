@@ -10,12 +10,14 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/products', [CustomerProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product:slug}', [CustomerProductController::class, 'show'])->name('products.show');
 
 // admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -60,10 +62,6 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::get('dashboard', function () {
         return view('customer.dashboard.index');
     })->name('dashboard');
-});
-
-Route::get('products', function () {
-    return view('customer.product');
 });
 
 // Route::middleware('auth')->group(function () {

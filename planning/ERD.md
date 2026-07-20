@@ -181,6 +181,7 @@ erDiagram
         bigint product_id FK
         bigint order_item_id FK
         integer rating
+        string comment
     }
 
     NOTIFICATIONS {

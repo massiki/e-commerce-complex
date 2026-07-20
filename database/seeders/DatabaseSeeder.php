@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Discount;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -52,5 +53,7 @@ class DatabaseSeeder extends Seeder
         foreach ($products as $product) {
             Discount::factory()->create(['product_id' => $product->id]);
         }
+
+        Review::factory(100)->create();
     }
 }
