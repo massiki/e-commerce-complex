@@ -12,7 +12,7 @@ class DiscountFactory extends Factory
     public function definition(): array
     {
         return [
-            'value' => fake()->randomFloat(2, 5000, 500000),
+            'value' => fake()->randomFloat(0, 8000, 8000000),
             'start_date' => fake()->dateTimeBetween('-1 month', 'now'),
             'end_date' => fake()->dateTimeBetween('now', '+2 months'),
         ];

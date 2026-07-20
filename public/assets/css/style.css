@@ -10359,6 +10359,9 @@ textarea.form-control-lg {
   width: 9px;
   height: 9px;
   margin-right: .25rem;
+  fill: #ccc; }
+
+.review-star_active {
   fill: #ffc78b; }
 
 .pc__btn-wl {

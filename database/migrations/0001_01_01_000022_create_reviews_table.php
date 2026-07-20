@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
             $table->foreignId('order_item_id')->nullable()->constrained('order_items')->nullOnDelete();
             $table->integer('rating');
+            $table->string('comment');
             $table->timestamps();
         });
     }

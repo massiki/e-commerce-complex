@@ -18,7 +18,6 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->boolean('featured')->default(false);
             $table->integer('stock')->default(0);
-            $table->decimal('rating', 2, 1)->default(0);
             $table->timestamps();
         });
     }
