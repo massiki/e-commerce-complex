@@ -54,6 +54,12 @@
             </thead>
             <tbody>
               @forelse ($products as $product)
+                @php
+                  $hasDiscount =
+                      $product->discount &&
+                      (!$product->discount->start_date || now() >= $product->discount->start_date) &&
+                      (!$product->discount->end_date || now() <= $product->discount->end_date);
+                @endphp
                 <tr>
                   <td>{{ $loop->iteration }}</td>
                   <td class="pname">
@@ -69,7 +75,7 @@
                   </td>
                   <td>Rp{{ number_format($product->price, 0, ',', '.') }}</td>
                   <td>
-                    @if ($product->discount)
+                    @if ($hasDiscount)
                       Rp{{ number_format($product->discount->value, 0, ',', '.') }}
                     @else
                       -
