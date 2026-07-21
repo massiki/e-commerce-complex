@@ -36,6 +36,58 @@
   <script src="{{ asset('assets/js/plugins/swiper.min.js') }}"></script>
   <script src="{{ asset('assets/js/plugins/countdown.js') }}"></script>
   <script src="{{ asset('assets/js/theme.js') }}"></script>
+
+  <script>
+    (function() {
+      var SearchProto = UomoElements.Search.prototype;
+
+      SearchProto._handleAjaxSearch = UomoHelpers.debounce(function(event, _this) {
+        var $form = event.target.closest(_this.selectors.container);
+        var keyword = event.target.value.trim();
+
+        if (keyword.length < 2) {
+          $form.classList.remove(_this.searchInputFocusedClass);
+          return;
+        }
+
+        var url = $form.getAttribute('data-search-url');
+        if (!url) return;
+
+        fetch(url + '?q=' + encodeURIComponent(keyword), { method: 'GET' })
+          .then(function(r) { if (r.ok) return r.json(); return Promise.reject(r); })
+          .then(function(data) { _this._updateSearchResult(data, $form); })
+          .catch(function(err) { _this._handleAjaxSearchError(err.message, $form); });
+      }, 180);
+
+      SearchProto._updateSearchResult = function(data, $form) {
+        var $rc = $form.querySelector(this.selectors.resultContainer);
+        if (!$rc) return;
+
+        if (!data.products || data.products.length === 0) {
+          $rc.innerHTML =
+            '<div class="search-result__empty text-center py-3 text-secondary">No products found</div>';
+          $form.classList.add(this.searchInputFocusedClass);
+          return;
+        }
+
+        var html = '<div class="search-result__list">';
+        data.products.forEach(function(p) {
+          html += '<a href="' + p.url +
+            '" class="search-result__item d-flex align-items-center gap-3 p-2 text-decoration-none">' +
+            '<img src="' + p.first_image + '" alt="' + p.name +
+            '" width="50" height="50" class="rounded" style="object-fit:cover;" loading="lazy">' +
+            '<div>' +
+            '<div class="fw-medium text-dark">' + p.name + '</div>' +
+            '<div class="text-secondary small">' + p.price_formatted + '</div>' +
+            '</div></a>';
+        });
+        html += '</div>';
+
+        $rc.innerHTML = html;
+        $form.classList.add(this.searchInputFocusedClass);
+      };
+    })();
+  </script>
 </body>
 
 </html>
