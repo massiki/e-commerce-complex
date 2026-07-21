@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable(['cart_id', 'product_id', 'quantity'])]
 class CartItem extends Model
 {
+    // relasi
     public function cart(): BelongsTo
     {
         return $this->belongsTo(Cart::class);
@@ -15,5 +18,14 @@ class CartItem extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // attribute
+    public function getSubTotalAttribute()
+    {
+        $subTotal = $this->product?->discount
+            ? $this->product->discount->value
+            : $this->product->price;
+        return ($subTotal ?? 0) * $this->quantity;
     }
 }

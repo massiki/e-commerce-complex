@@ -13,16 +13,10 @@
       }'>
       <div class="swiper-wrapper">
         @foreach ($sliders as $slider)
-          @php
-            $sliderImage =
-                $slider->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($slider->image)
-                    ? asset('storage/' . $slider->image)
-                    : asset('image-600x400.png');
-          @endphp
           <div class="swiper-slide">
             <div class="overflow-hidden position-relative h-100">
               <div class="slideshow-character position-absolute bottom-0 pos_right-center">
-                <img loading="lazy" src="{{ $sliderImage }}" width="542" height="733" alt="{{ $slider->title }}"
+                <img loading="lazy" src="{{ $slider->slider_image }}" width="542" height="733" alt="{{ $slider->title }}"
                   class="slideshow-character__img animate animate_fade animate_btt animate_delay-9 w-auto h-auto" />
               </div>
               <div class="slideshow-text container position-absolute start-50 top-50 translate-middle">
@@ -92,15 +86,9 @@
             }'>
             <div class="swiper-wrapper">
               @foreach ($categories as $category)
-                @php
-                  $catImage =
-                      $category->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($category->image)
-                          ? \Illuminate\Support\Facades\Storage::url($category->image)
-                          : asset('image-600x400.png');
-                @endphp
                 <div class="swiper-slide">
-                  <img loading="lazy" class="w-100 h-auto mb-3" src="{{ $catImage }}" width="124" height="124"
-                    alt="{{ $category->name }}" />
+                  <img loading="lazy" class="w-100 h-auto mb-3" src="{{ $category->cat_image }}" width="124"
+                    height="124" alt="{{ $category->name }}" />
                   <div class="text-center">
                     <a href="#" class="menu-link fw-medium">{{ $category->name }}</a>
                   </div>
@@ -197,26 +185,15 @@
                 }'>
                 <div class="swiper-wrapper">
                   @foreach ($hotDealProducts as $product)
-                    @php
-                      $prodImage =
-                          $product->images->first()?->image &&
-                          \Illuminate\Support\Facades\Storage::disk('public')->exists($product->images->first()->image)
-                              ? asset('storage/' . $product->images->first()->image)
-                              : asset('image-600x400.png');
-                      $discountVal = $product->discount?->value;
-                      $salePrice = $discountVal ?? null;
-                      $hasDiscount =
-                          $product->discount &&
-                          (!$product->discount->start_date || now() >= $product->discount->start_date) &&
-                          (!$product->discount->end_date || now() <= $product->discount->end_date);
-                    @endphp
                     <div class="swiper-slide product-card product-card_style3">
                       <div class="pc__img-wrapper">
                         <a href="{{ route('products.index') }}">
-                          <img loading="lazy" src="{{ $prodImage }}" width="258" height="313"
+                          <img loading="lazy" src="{{ $product->first_image }}" width="258" height="313"
                             alt="{{ $product->name }}" class="pc__img">
-                          <img loading="lazy" src="{{ $prodImage }}" width="258" height="313"
-                            alt="{{ $product->name }}" class="pc__img pc__img-second">
+                          @if ($product->second_image)
+                            <img loading="lazy" src="{{ $product->second_image }}" width="258" height="313"
+                              alt="{{ $product->name }}" class="pc__img pc__img-second">
+                          @endif
                         </a>
                         @if ($product->stock == 0)
                           <div
@@ -229,10 +206,12 @@
                       <div class="pc__info position-relative">
                         <h6 class="pc__title"><a href="{{ route('products.index') }}">{{ $product->name }}</a></h6>
                         <div class="product-card__price d-flex{{ $product->discount ? ' align-items-center' : '' }}">
-                          @if ($hasDiscount && $salePrice)
+                          @if ($product->has_discount)
                             <span
                               class="money price price-old">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
-                            <span class="money price price-sale">Rp{{ number_format($salePrice, 0, ',', '.') }}</span>
+                            <span
+                              class="money price price-sale">Rp{{ number_format($product->discount->value, 0, ',', '.') }}
+                            </span>
                           @else
                             <span class="money price">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                           @endif
@@ -240,8 +219,23 @@
 
                         <div
                           class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-                          <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart js-open-aside"
-                            data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
+                          @php $inCart = $cartItems->get($product->id); @endphp
+                          @if ($inCart)
+                            <form method="POST" action="{{ route('customer.cart.remove', $inCart) }}"
+                              class="d-inline">
+                              @csrf @method('DELETE')
+                              <button type="submit"
+                                class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
+                                title="Remove From Cart">Remove From Cart</button>
+                            </form>
+                          @else
+                            <form method="POST" action="{{ route('customer.cart.add', $product) }}" class="d-inline">
+                              @csrf
+                              <button type="submit"
+                                class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
+                                title="Add To Cart">Add To Cart</button>
+                            </form>
+                          @endif
                           <a href="{{ route('products.show', $product->slug) }}"
                             class="btn-link btn-link_lg me-4 text-uppercase fw-medium">
                             <span class="d-none d-xxl-block">Quick View</span>
@@ -272,15 +266,9 @@
       <section class="category-banner container">
         <div class="row">
           @foreach ($bannerCategories as $category)
-            @php
-              $bannerImage =
-                  $category->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($category->image)
-                      ? asset('storage/' . $category->image)
-                      : asset('image-600x400.png');
-            @endphp
             <div class="col-md-6">
               <div class="category-banner__item border-radius-10 mb-5">
-                <img loading="lazy" class="h-auto" src="{{ $bannerImage }}" width="690" height="665"
+                <img loading="lazy" class="h-auto" src="{{ $category->cat_image }}" width="690" height="665"
                   alt="{{ $category->name }}" />
                 <div class="category-banner__item-content">
                   <h3 class="mb-0">{{ $category->name }}</h3>
@@ -300,30 +288,16 @@
 
         <div class="row">
           @foreach ($featuredProducts as $product)
-            @php
-              $featImage =
-                  $product->images->first()?->image &&
-                  \Illuminate\Support\Facades\Storage::disk('public')->exists($product->images->first()->image)
-                      ? asset('storage/' . $product->images->first()->image)
-                      : asset('image-600x400.png');
-              $discountPercent = $product->discount
-                  ? 100 - round(($product->discount->value / $product->price) * 100)
-                  : null;
-              $hasDiscount =
-                  $product->discount &&
-                  (!$product->discount->start_date || now() >= $product->discount->start_date) &&
-                  (!$product->discount->end_date || now() <= $product->discount->end_date);
-            @endphp
             <div class="col-6 col-md-4 col-lg-3">
               <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
                 <div class="pc__img-wrapper">
                   <a href="{{ route('products.show', $product->slug) }}">
-                    <img loading="lazy" src="{{ $featImage }}" width="330" height="400"
+                    <img loading="lazy" src="{{ $product->first_image }}" width="330" height="400"
                       alt="{{ $product->name }}" class="pc__img">
                   </a>
-                  @if ($discountPercent && $hasDiscount)
+                  @if ($product->discount_percent && $product->has_discount)
                     <div class="product-label bg-red text-white right-0 top-0 left-auto mt-2 mx-2">
-                      {{ $discountPercent }}%</div>
+                      {{ $product->discount_percent }}%</div>
                   @endif
                   @if ($product->stock == 0)
                     <div class="position-absolute top-50 start-50 translate-middle bg-dark text-white px-3 py-2 rounded">
@@ -334,17 +308,31 @@
                 <div class="pc__info position-relative">
                   <h6 class="pc__title"><a href="{{ route('products.index') }}">{{ $product->name }}</a></h6>
                   <div class="product-card__price d-flex align-items-center">
-                    @if ($hasDiscount && $salePrice)
+                    @if ($product->has_discount)
                       <span class="money price price-old">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
-                      <span class="money price price-sale">Rp{{ number_format($salePrice, 0, ',', '.') }}</span>
+                      <span
+                        class="money price price-sale">Rp{{ number_format($product->discount->value, 0, ',', '.') }}</span>
                     @else
                       <span class="money price">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                     @endif
                   </div>
                   <div
                     class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-                    <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart js-open-aside"
-                      data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
+                    @php $inCart = $cartItems->get($product->id); @endphp
+                    @if ($product->inCart)
+                      <form method="POST" action="{{ route('customer.cart.remove', $product->inCart) }}"
+                        class="d-inline">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
+                          title="Remove From Cart">Remove From Cart</button>
+                      </form>
+                    @else
+                      <form method="POST" action="{{ route('customer.cart.add', $product) }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
+                          title="Add To Cart">Add To Cart</button>
+                      </form>
+                    @endif
                     <a href="{{ route('products.show', $product->slug) }}"
                       class="btn-link btn-link_lg me-4 text-uppercase fw-medium">
                       <span class="d-none d-xxl-block">Quick View</span>

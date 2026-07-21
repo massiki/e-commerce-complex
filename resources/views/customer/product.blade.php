@@ -45,10 +45,6 @@
           </div>
         </div>
 
-
-
-
-
         <div class="accordion" id="brand-filters">
           <div class="accordion-item mb-4 pb-3">
             <h5 class="accordion-header" id="accordion-heading-brand">
@@ -89,9 +85,6 @@
             </div>
           </div>
         </div>
-
-
-
       </div>
 
       <div class="shop-list flex-grow-1">
@@ -233,14 +226,6 @@
 
         <div class="products-grid row row-cols-2 row-cols-md-3" id="products-grid">
           @forelse($products as $product)
-            @php
-              $discountVal = $product->discount?->value;
-              $salePrice = $discountVal ?? null;
-              $hasDiscount =
-                  $product->discount &&
-                  (!$product->discount->start_date || now() >= $product->discount->start_date) &&
-                  (!$product->discount->end_date || now() <= $product->discount->end_date);
-            @endphp
             <div class="product-card-wrapper">
               <div class="product-card mb-3 mb-md-4 mb-xxl-5">
                 <div class="pc__img-wrapper">
@@ -250,9 +235,8 @@
                       @forelse($product->images as $image)
                         <div class="swiper-slide">
                           <a href="{{ route('products.show', $product->slug) }}">
-                            <img loading="lazy"
-                              src="{{ \Illuminate\Support\Facades\Storage::disk('public')->exists($image->image) ? asset('storage/' . $image->image) : asset('image-600x400.png') }}"
-                              width="330" height="400" alt="{{ $product->name }}" class="pc__img">
+                            <img loading="lazy" src="{{ $image->show_image }}" width="330" height="400"
+                              alt="{{ $product->name }}" class="pc__img">
                           </a>
                         </div>
                       @empty
@@ -275,6 +259,22 @@
                         </svg></span>
                     @endif
                   </div>
+                  @php $inCart = $cartItems->get($product->id); @endphp
+                  @if ($inCart)
+                    <form method="POST" action="{{ route('customer.cart.remove', $inCart) }}" class="d-inline">
+                      @csrf @method('DELETE')
+                      <button type="submit"
+                        class="pc__atc btn btn-danger anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
+                        title="Remove From Cart">Remove From Cart</button>
+                    </form>
+                  @else
+                    <form method="POST" action="{{ route('customer.cart.add', $product) }}" class="d-inline">
+                      @csrf
+                      <button type="submit"
+                        class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
+                        title="Add To Cart">Add To Cart</button>
+                    </form>
+                  @endif
                   @if ($product->stock == 0)
                     <div class="position-absolute top-50 start-50 translate-middle bg-dark text-white px-3 py-2 rounded"
                       style="z-index: 2;">
@@ -287,11 +287,12 @@
                   <p class="pc__category">{{ $product->category?->name }}</p>
                   <h6 class="pc__title"><a
                       href="{{ route('products.show', $product->slug) }}">{{ $product->name }}</a></h6>
-                  <div class="product-card__price d-flex{{ $salePrice ? ' align-items-center' : '' }}">
-                    @if ($hasDiscount)
+                  <div
+                    class="product-card__price d-flex{{ $product->discount->value ?? null ? ' align-items-center' : '' }}">
+                    @if ($product->has_discount)
                       <span class="money price price-old">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                       <span
-                        class="money price{{ $salePrice ? ' price-sale' : '' }}">Rp{{ number_format($salePrice ?? $product->price, 0, ',', '.') }}</span>
+                        class="money price{{ $product->discount->value ? ' price-sale' : '' }}">Rp{{ number_format($product->discount->value, 0, ',', '.') }}</span>
                     @else
                       <span class="money price">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                     @endif
@@ -311,11 +312,10 @@
                   </div>
                 </div>
 
-                @if ($salePrice && $hasDiscount)
+                @if ($product->has_discount)
                   <div class="pc-labels position-absolute top-0 start-0 w-100 d-flex justify-content-between">
                     <div class="pc-labels__right ms-auto">
-                      <span
-                        class="pc-label pc-label_sale d-block text-white">{{ 100 - round(($discountVal / $product->price) * 100) }}%</span>
+                      <span class="pc-label pc-label_sale d-block text-white">{{ $product->discount_percent }}%</span>
                     </div>
                   </div>
                 @endif

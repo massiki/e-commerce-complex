@@ -108,13 +108,7 @@
             </span>
           </div>
           <div class="product-single__price">
-            @php
-              $hasDiscount =
-                  $product->discount &&
-                  (!$product->discount->start_date || now() >= $product->discount->start_date) &&
-                  (!$product->discount->end_date || now() <= $product->discount->end_date);
-            @endphp
-            @if ($hasDiscount)
+            @if ($product->has_discount)
               <span class="current-price">
                 <span class="money price price-old">Rp{{ number_format($product->price, 0, ',', '.') }}</span>
                 <span
@@ -129,19 +123,27 @@
           <div class="product-single__short-desc">
             <p>{{ $product->description }}</p>
           </div>
-          <form name="addtocart-form" method="post">
-            <div class="product-single__addtocart">
-              <div class="qty-control position-relative">
-                <input type="number" name="quantity" value="1" min="1"
-                  class="qty-control__number text-center">
-                <div class="qty-control__reduce">-</div>
-                <div class="qty-control__increase">+</div>
+          @if ($cartItem)
+            <form method="POST" action="{{ route('customer.cart.remove', $cartItem) }}">
+              @csrf @method('DELETE')
+              <div class="product-single__addtocart">
+                <button type="submit" class="btn btn-danger btn-addtocart w-100">Remove from Cart</button>
               </div>
-              <button type="submit" class="btn btn-primary btn-addtocart js-open-aside" data-aside="cartDrawer">Add to
-                Cart
-              </button>
-            </div>
-          </form>
+            </form>
+          @else
+            <form name="addtocart-form" method="post" action="{{ route('customer.cart.add', $product) }}">
+              @csrf
+              <div class="product-single__addtocart">
+                <div class="qty-control position-relative">
+                  <input type="number" name="quantity" value="1" min="1"
+                    class="qty-control__number text-center">
+                  <div class="qty-control__reduce">-</div>
+                  <div class="qty-control__increase">+</div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-addtocart">Add to Cart</button>
+              </div>
+            </form>
+          @endif
           <div class="product-single__addtolinks">
             <a href="#" class="menu-link menu-link_us-s add-to-wishlist"><svg width="16" height="16"
                 viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

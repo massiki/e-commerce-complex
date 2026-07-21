@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Storage;
 
-if (!function_exists('imageUrl')) {
+if (! function_exists('imageUrl')) {
     function imageUrl(?string $path, string $default = 'image-600x400.png'): string
     {
         if ($path && Storage::exists($path)) {

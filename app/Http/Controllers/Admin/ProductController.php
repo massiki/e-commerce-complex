@@ -22,18 +22,24 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand', 'images', 'discount' => function ($query) {
-            $query->whereDate('start_date', '<=', now())
-                ->whereDate('end_date', '>=', now());
-        }])
-            ->when($request->search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%{$search}%"))
-                    ->orWhereHas('brand', fn ($q) => $q->where('name', 'like', "%{$search}%"));
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+        $products = Product::with([
+            'category',
+            'brand',
+            'images',
+            'discount' => function ($query) {
+                $query->where(function ($q) {
+                    $q->whereNull('start_date')
+                        ->orWhereDate('start_date', '<=', now());
+                })->where(function ($q) {
+                    $q->whereNull('end_date')
+                        ->orWhereDate('end_date', '>=', now());
+                });
+            },
+        ])->when($request->search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhereHas('category', fn ($q) => $q->where('name', 'like', "%{$search}%"))
+                ->orWhereHas('brand', fn ($q) => $q->where('name', 'like', "%{$search}%"));
+        })->latest()->paginate(10)->withQueryString();
 
         return view('admin.products.index', compact('products'));
     }
