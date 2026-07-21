@@ -1,6 +1,6 @@
 # Progress Proyek E-Commerce Complex
 
-**Terakhir diperbarui:** 19 Juli 2026
+**Terakhir diperbarui:** 21 Juli 2026
 
 ---
 
@@ -9,12 +9,12 @@
 | Komponen | Progress |
 |----------|----------|
 | Database Schema | ✅ ~100% (23 migrations) |
-| Models | ✅ ~100% (20 models, 50% pakai fillable/guarded) |
-| Controllers | ⬜ ~60% (10 admin: 5 complete, 5 partial; 1 customer) |
-| Views (Blade) | ⬜ ~65% (71 file: 22 admin + 13 customer + 19 components + 5 layouts + 6 auth + 6 other) |
-| Routes | ⬜ ~65% (11 admin groups, 1 customer route + 1 closure) |
+| Models | ✅ ~100% (20 models: 8 attribute, 5 fillable, 7 tanpa) |
+| Controllers | ⬜ ~75% (26 total: 10 admin, 5 customer, 9 auth, 1 profile, 1 base) |
+| Views (Blade) | ⬜ ~65% (71 file: 21 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root) |
+| Routes | ⬜ ~75% (8 customer routes + 6 customer auth routes + ~30 admin routes) |
 | Tests | ⬜ ~10% (11 files, semua Breeze default) |
-| **Estimasi Keseluruhan** | **⬜ ~43%** |
+| **Estimasi Keseluruhan** | **⬜ ~55%** |
 
 ---
 
@@ -57,13 +57,14 @@
 
 ### Seeders
 - `DatabaseSeeder` — seeds: 2 roles, 2 users, 5 brands, 5 categories, 50 products
-- Factories: `UserFactory`, `CategoryFactory`, `BrandFactory`, `ProductFactory`, `DiscountFactory`
+- Factories: `UserFactory`, `CategoryFactory`, `BrandFactory`, `ProductFactory`, `DiscountFactory`, `ReviewFactory`
 
 ### Models (20 total)
 | Status | Models |
 |--------|--------|
-| ✅ Dengan `$fillable` / `$guarded` | User (`#[Fillable]`), Brand, Category, Coupon, Slider, Product (`#[Guarded([])]`), ProductImage (`#[Guarded([])]`), Discount (`#[Guarded([])]`), Review (`#[Guarded([])]`), ActivityLog |
-| ⬜ Tanpa `$fillable` / `$guarded` (rentan mass assignment) | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role |
+| ✅ PHP 8 Attributes (`#[Fillable]`/`#[Guarded]`) | User, Product, Cart, CartItem, Wishlist, WishlistItem, Review, Discount, ProductImage |
+| ✅ Traditional `$fillable`/`$guarded` | Brand, Category, Coupon, Slider, ActivityLog |
+| ⬜ Tanpa `$fillable` / `$guarded` (rentan mass assignment) | Order, OrderItem, CouponUsage, Address, Role, Notification |
 
 ### Admin CRUD — Complete (Controller + Views + Routes + ActivityLog)
 | Fitur | Controller | Index | Create | Edit | Store | Update | Destroy | ActivityLog |
@@ -74,13 +75,41 @@
 | **Product** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
 | **Slider** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ store/update/destroy |
 
+### Customer Area — Public Routes (No Auth)
+| Fitur | Controller | Routes | Status |
+|-------|-----------|--------|--------|
+| **Home** | `HomeController::index()` | `GET /` → `home` | ✅ |
+| **Product Listing** | `ProductController::index()` | `GET /products` → `products.index` | ✅ |
+| **Product Detail** | `ProductController::show()` | `GET /products/{product:slug}` → `products.show` | ✅ |
+| **Cart View** | `CartController::index()` | `GET /cart` → `cart.index` | ✅ |
+| **Wishlist View** | `WishlistController::index()` | `GET /wishlist` → `wishlist.index` | ✅ |
+| **Product Search (AJAX)** | `SearchController::search()` | `GET /products/search` → `products.search` | ✅ |
+
+### Customer Area — Authenticated Routes (role:customer)
+| Fitur | Controller | Routes | Status |
+|-------|-----------|--------|--------|
+| **Dashboard** | Closure | `GET /customer/dashboard` → `customer.dashboard` | ⬜ View statis |
+| **Cart Add** | `CartController::store()` | `POST /customer/cart/add/{product}` | ✅ |
+| **Cart Update** | `CartController::update()` | `PATCH /customer/cart/update` | ✅ |
+| **Cart Remove** | `CartController::destroy()` | `DELETE /customer/cart/remove/{cartItem}` | ✅ |
+| **Wishlist Add** | `WishlistController::store()` | `POST /customer/wishlist/add/{product}` | ✅ |
+| **Wishlist Remove** | `WishlistController::remove()` | `DELETE /customer/wishlist/remove/{wishlistItem}` | ✅ |
+
+### Customer AJAX Search
+- `SearchController::search()` — return JSON produk by name `LIKE`
+- Route `GET /products/search` terdaftar SEBELUM `products/{slug}`
+- Input minimal 2 karakter, debounce 180ms, limit 8 hasil
+- Tampilkan gambar + nama + harga di dropdown hasil pencarian
+- Override JavaScript di `layouts/app.blade.php` (setelah theme.js)
+
 ### Routes (web.php)
-- 7 resource routes di admin: brands, categories, products, coupons, sliders (semua `except(['show'])`), orders (FULL resource)
-- 3 GET-only routes: customers, reviews, activities
-- 1 index+update route: settings
-- 1 customer dashboard route: dashboard
-- 1 home route: `/` → `HomeController::index`
-- 1 guest route: products (static view)
+- **Customer public:** `/`, `/products`, `/products/search`, `/products/{product:slug}`, `/cart`, `/wishlist`
+- **Customer auth:** `/customer/dashboard`, cart CRUD, wishlist CRUD
+- **Admin** (middleware `auth+role:admin`, prefix `admin/`):
+  - 5 full resource routes: brands, categories, products, coupons, sliders (`except(['show'])`)
+  - 1 full resource: orders (hanya `index()` terisi)
+  - 3 read-only: customers, reviews, activities
+  - 1 setting: index + update
 
 ---
 
@@ -93,20 +122,15 @@
 | Reviews | `index()` saja | `index.blade.php` | GET only | ❌ |
 | Activities | `index()` saja | `index.blade.php` | GET only | ❌ (read-only) |
 | Settings | `index()` + `update()` | `index.blade.php` | GET + POST | ❌ |
-| **Orders** | **`index()` saja** | **`index.blade.php`, `show.blade.php`** | **Full resource** (hanya index terisi) | ❌ |
+| **Orders** | **`index()` saja** | **`index.blade.php`, `show.blade.php`** | **Full resource** (show/store/update/destroy belum diimplementasi) | ❌ |
 
-### Customer Area — Sebagian sudah ada controller
+### Customer Area — View Saja (Controller Belum)
 | Fitur | View Files | Controller | Routes |
 |-------|-----------|------------|--------|
-| **Home** | **`customer/home.blade.php`** | **✅ `HomeController::index()`** | **✅ `Route::get('/', ...)`** |
-| Product Listing | `customer/product.blade.php` | ❌ | Closure static view |
-| Product Detail | `customer/product-detail.blade.php` | ❌ | ❌ |
-| Carts | `customer/carts.blade.php` | ❌ | ❌ |
-| Wishlists | `customer/wishlists.blade.php` | ❌ | ❌ |
-| Dashboard | `customer/dashboard/index.blade.php` | ❌ | Closure static view |
+| Dashboard | `customer/dashboard/index.blade.php` | ❌ (Closure) | Static view |
 | Account | `customer/dashboard/account.blade.php` | ❌ | ❌ |
 | History | `customer/dashboard/history.blade.php` | ❌ | ❌ |
-| Orders (customer) | `dashboard/orders/index.blade.php`, `show.blade.php` | ❌ | ❌ |
+| Orders | `dashboard/orders/index.blade.php`, `show.blade.php` | ❌ | ❌ |
 | Addresses | `dashboard/addresses/index.blade.php`, `create.blade.php`, `edit.blade.php` | ❌ | ❌ |
 
 ---
@@ -121,8 +145,8 @@
 | Dashboard Analytics | 🟡 Sedang | View statis, belum connect ke database |
 | PDF Invoice | 🟡 Sedang | Butuh `barryvdh/laravel-dompdf` |
 | Notification System | 🟡 Sedang | Belum ada `app/Notifications/` |
-| Customer Controllers (8 fitur) | 🟡 Sedang | Baru HomeController, 8 fitur lainnya masih view statis |
-| Order `show/edit/update/destroy` | 🟡 Sedang | Controller cuma punya `index()` |
+| Order show/update (Admin) | 🟡 Sedang | `OrderController` cuma punya `index()`, view `show.blade.php` statis |
+| Customer Dashboard Controller | 🟡 Sedang | 5 view sudah ada, controller belum |
 | Auto Rating Calculation | 🟢 Ringan | - |
 | Low Stock Warning | 🟢 Ringan | - |
 | Soft Delete Product | 🟢 Ringan | - |
@@ -135,12 +159,12 @@
 | Issue | Detail | Severity |
 |-------|--------|----------|
 | Register tidak assign role | User baru daftar dapat `role_id = null` | 🔴 Tinggi |
-| 10 model tanpa `$fillable`/`$guarded` | Cart, CartItem, Order, OrderItem, CouponUsage, Wishlist, WishlistItem, Address, Notification, Role — rawan mass assignment | 🔴 Tinggi |
-| Route profile di-comment | `routes/web.php` line 64-68 | 🟡 Sedang |
+| 6 model tanpa `$fillable`/`$guarded` | Order, OrderItem, CouponUsage, Address, Role, Notification — rawan mass assignment | 🔴 Tinggi |
+| Route profile di-comment | `routes/web.php` line 82-86 | 🟡 Sedang |
 | Dashboard masih statis | Belum ada query real dari database | 🟡 Sedang |
 | Activity log manual | Belum pakai event/listener atau observer | 🟡 Sedang |
 | **OrderController hanya index()** | Full resource route, tapi show/create/store/edit/update/destroy belum diimplementasi | 🟡 Sedang |
-| **Customer controller minim** | Hanya `HomeController::index()` yang aktif, 8 fitur lainnya masih closure/view statis | 🔴 Tinggi |
+| **Customer dashboard controller** | 5 view sudah ada, controller + routes belum dibuat | 🟡 Sedang |
 | Inconsistency `Auth::user()->id` vs `Auth::id()` | Brand/Category/Slider pakai `Auth::user()->id`, Coupon/Product pakai `Auth::id()` | 🟢 Ringan |
 
 ---
@@ -151,7 +175,7 @@
 |--------|-------|--------|
 | 1 | **Order Management (Admin)** | Controller baru index(), perlu show + update status order + routes |
 | 2 | **Checkout (COD → Midtrans)** | Alur transaksi utama |
-| 3 | **Customer Controllers** | Landing page, product listing, cart, wishlist, dll |
+| 3 | **Customer Dashboard Controllers** | Account, orders, addresses, history — 5 view sudah siap |
 | 4 | **Dashboard Analytics** | Query real dari database untuk admin & customer |
 | 5 | **Discount Scheduler** | Otomatisasi diskon |
 | 6 | **Reviews & Rating** | Setelah order selesai |
@@ -183,10 +207,11 @@
 - [x] Register
 - [x] Login
 - [x] Home Page (Hero Slider, Categories, Hot Deals, Featured Products)
+- [x] Browse Products (Filter, Sort, Detail)
+- [x] Product Search (AJAX, debounce, live results)
+- [x] Wishlist (View, Add, Remove)
+- [x] Shopping Cart (View, Add, Update Qty, Remove)
 - [/] Dashboard (Total Orders, Spending, Wishlist, Notifications, Payment History) — view statis
-- [/] Browse Products (Search, Filter, Detail) — view statis
-- [ ] Wishlist (Add, Remove)
-- [ ] Shopping Cart (Add, Update Qty, Remove)
 - [ ] Address Management (Rumah/Kantor/Kos — Recipient, Phone, Province, City, District, Postal Code, Full Address)
 - [ ] Checkout (Midtrans & COD)
 - [ ] Order Detail (Invoice, Status, Items, Shipping Cost, Total)
@@ -220,12 +245,12 @@
 ## Total File Summary
 
 ```
-app/Models/              → 20 models (10 tanpa $fillable/guarded)
-app/Http/Controllers/    → 22 controllers (10 admin: 5 complete CRUD, 5 partial; 1 customer; 8 auth; 1 profile; 1 base; 1 home)
-resources/views/         → 71 Blade files (22 admin + 13 customer + 19 components + 5 layouts + 6 auth + 6 other)
+app/Models/              → 20 models (6 tanpa fillable/guarded)
+app/Http/Controllers/    → 26 controllers (10 admin: 5 complete, 5 partial; 5 customer: all complete; 9 auth; 1 profile; 1 base)
+resources/views/         → 71 Blade files (21 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root)
 database/migrations/     → 23 migrations
 database/seeders/        → 1 seeder (DatabaseSeeder)
-database/factories/      → 5 factories (+ DiscountFactory)
+database/factories/      → 6 factories (+ ReviewFactory)
 routes/                  → web.php, auth.php, console.php
 tests/                   → 11 test files (semua Breeze default)
 planning/                → 6 dokumen (BRIEF, ERD, USE_CASE, SEQUENCE, ACTIVITY, progres)
