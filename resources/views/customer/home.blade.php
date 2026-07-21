@@ -114,6 +114,78 @@
 
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
+      <section class="category-carousel container">
+        <h2 class="section-title text-center mb-3 pb-xl-2 mb-xl-4">Shop by Brand</h2>
+
+        <div class="position-relative">
+          <div class="swiper-container js-swiper-slider"
+            data-settings='{
+              "autoplay": {
+                "delay": 5000
+              },
+              "slidesPerView": 8,
+              "slidesPerGroup": 1,
+              "effect": "none",
+              "loop": true,
+              "navigation": {
+                "nextEl": ".products-carousel__next-2",
+                "prevEl": ".products-carousel__prev-2"
+              },
+              "breakpoints": {
+                "320": {
+                  "slidesPerView": 2,
+                  "slidesPerGroup": 2,
+                  "spaceBetween": 15
+                },
+                "768": {
+                  "slidesPerView": 4,
+                  "slidesPerGroup": 4,
+                  "spaceBetween": 30
+                },
+                "992": {
+                  "slidesPerView": 6,
+                  "slidesPerGroup": 1,
+                  "spaceBetween": 45,
+                  "pagination": false
+                },
+                "1200": {
+                  "slidesPerView": 8,
+                  "slidesPerGroup": 1,
+                  "spaceBetween": 60,
+                  "pagination": false
+                }
+              }
+            }'>
+            <div class="swiper-wrapper">
+              @foreach ($brands as $brand)
+                <div class="swiper-slide">
+                  <img loading="lazy" class="w-100 h-auto mb-3" src="{{ $brand->image ? asset('storage/' . $brand->image) : asset('image-600x400.png') }}" width="124"
+                    height="124" alt="{{ $brand->name }}" />
+                  <div class="text-center">
+                    <a href="#" class="menu-link fw-medium">{{ $brand->name }}</a>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+          </div>
+
+          <div
+            class="products-carousel__prev products-carousel__prev-2 position-absolute top-50 d-flex align-items-center justify-content-center">
+            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
+              <use href="#icon_prev_md" />
+            </svg>
+          </div>
+          <div
+            class="products-carousel__next products-carousel__next-2 position-absolute top-50 d-flex align-items-center justify-content-center">
+            <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
+              <use href="#icon_next_md" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
+
       <section class="hot-deals container">
         <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Hot Deals</h2>
         <div class="row">
