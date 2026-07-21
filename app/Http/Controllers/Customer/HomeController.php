@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Slider;
@@ -14,6 +15,7 @@ class HomeController extends Controller
     {
         $sliders = Slider::latest('created_at')->get();
         $categories = Category::latest('created_at')->get();
+        $brands = Brand::latest('created_at')->get();
 
         $hotDealProducts = Product::whereHas('discount', function ($query) {
             $query->where(fn ($q) => $q->whereNull('start_date')->orWhere('start_date', '<=', now()))
@@ -36,6 +38,7 @@ class HomeController extends Controller
 
         return view('customer.home', compact(
             'sliders',
+            'brands',
             'categories',
             'hotDealProducts',
             'featuredProducts',
