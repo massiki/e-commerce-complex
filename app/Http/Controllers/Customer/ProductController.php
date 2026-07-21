@@ -67,6 +67,13 @@ class ProductController extends Controller
                 ->first();
         }
 
-        return view('customer.product-detail', compact('product', 'related', 'cartItem'));
+        $wishlistItem = null;
+        if (Auth::check()) {
+            $wishlistItem = Auth::user()->wishlist?->items()
+                ->where('product_id', $product->id)
+                ->first();
+        }
+
+        return view('customer.product-detail', compact('product', 'related', 'cartItem', 'wishlistItem'));
     }
 }

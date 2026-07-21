@@ -71,6 +71,11 @@
       </clipPath>
     </defs>
   </symbol>
+  <symbol id="icon_heart_filled" viewBox="0 0 20 20">
+    <path
+      d="M10 17.79l-1.21-1.1C4.5 13.3 1.67 10.9 1.67 8c0-2.58 2.02-4.58 4.58-4.58 1.45 0 2.85.68 3.75 1.74.9-1.06 2.3-1.74 3.75-1.74 2.56 0 4.58 2 4.58 4.58 0 2.9-2.83 5.3-7.12 8.69L10 17.79z"
+      fill="currentColor" />
+  </symbol>
   <symbol id="icon_star" viewBox="0 0 9 9">
     <path
       d="M4.0172 0.313075L2.91869 2.64013L0.460942 3.0145C0.0201949 3.08129 -0.15644 3.64899 0.163185 3.97415L1.94131 5.78447L1.52075 8.34177C1.44505 8.80402 1.91103 9.15026 2.30131 8.93408L4.5 7.72661L6.69869 8.93408C7.08897 9.14851 7.55495 8.80402 7.47925 8.34177L7.05869 5.78447L8.83682 3.97415C9.15644 3.64899 8.97981 3.08129 8.53906 3.0145L6.08131 2.64013L4.9828 0.313075C4.78598 -0.101718 4.2157 -0.10699 4.0172 0.313075Z" />
@@ -246,13 +251,21 @@
       </a>
     </div>
 
-    <a href="#" class="header-tools__item header-tools__cart js-open-aside" data-aside="cartDrawer">
-      <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-        xmlns="http://www.w3.org/2000/svg">
-        <use href="#icon_cart" />
-      </svg>
-      <span class="cart-amount d-block position-absolute js-cart-items-count">{{ $cartCount ?? 0 }}</span>
-    </a>
+    <div class="d-flex align-items-center gap-3">
+      <a href="{{ route('wishlist.index') }}" class="header-tools__item">
+        <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <use href="#icon_heart" />
+        </svg>
+      </a>
+      <a href="{{ route('cart.index') }}" class="header-tools__item header-tools__cart js-open-aside" data-aside="cartDrawer">
+        <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <use href="#icon_cart" />
+        </svg>
+        <span class="cart-amount d-block position-absolute js-cart-items-count">{{ $cartCount ?? 0 }}</span>
+      </a>
+    </div>
   </div>
 
   <nav
@@ -288,6 +301,9 @@
           </li>
           <li class="navigation__item">
             <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
+          </li>
+          <li class="navigation__item">
+            <a href="{{ route('wishlist.index') }}" class="navigation__link">Wishlist</a>
           </li>
           <li class="navigation__item">
             <a href="about.html" class="navigation__link">About</a>
@@ -444,7 +460,7 @@
           </a>
         </div>
 
-        <a href="wishlist.html" class="header-tools__item">
+        <a href="{{ route('wishlist.index') }}" class="header-tools__item">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <use href="#icon_heart" />
           </svg>
