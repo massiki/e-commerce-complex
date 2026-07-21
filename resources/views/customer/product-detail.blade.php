@@ -145,10 +145,37 @@
             </form>
           @endif
           <div class="product-single__addtolinks">
-            <a href="#" class="menu-link menu-link_us-s add-to-wishlist"><svg width="16" height="16"
-                viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <use href="#icon_heart" />
-              </svg><span>Add to Wishlist</span></a>
+            @if ($wishlistItem)
+              <a href="#" class="menu-link menu-link_us-s add-to-wishlist"
+                onclick="event.preventDefault(); document.getElementById('remove-wishlist-form').submit();">
+                <svg width="16" height="16" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="color: #dc2626">
+                  <use href="#icon_heart_filled" />
+                </svg><span>Remove from Wishlist</span>
+              </a>
+              <form method="POST" action="{{ route('customer.wishlist.remove', $wishlistItem) }}"
+                id="remove-wishlist-form" class="d-none">
+                @csrf @method('DELETE')
+              </form>
+            @else
+              @auth
+                <a href="#" class="menu-link menu-link_us-s add-to-wishlist"
+                  onclick="event.preventDefault(); document.getElementById('add-wishlist-form').submit();">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <use href="#icon_heart" />
+                  </svg><span>Add to Wishlist</span>
+                </a>
+                <form method="POST" action="{{ route('customer.wishlist.add', $product) }}"
+                  id="add-wishlist-form" class="d-none">
+                  @csrf
+                </form>
+              @else
+                <a href="{{ route('login') }}" class="menu-link menu-link_us-s add-to-wishlist">
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <use href="#icon_heart" />
+                  </svg><span>Add to Wishlist</span>
+                </a>
+              @endauth
+            @endif
             <share-button class="share-button">
               <button class="menu-link menu-link_us-s to-share border-0 bg-transparent d-flex align-items-center">
                 <svg width="16" height="19" viewBox="0 0 16 19" fill="none"

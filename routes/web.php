@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
+use App\Http\Controllers\Customer\WishlistController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [CustomerProductController::class, 'index'])->name('products.index');
 Route::get('/products/{product:slug}', [CustomerProductController::class, 'show'])->name('products.show');
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
 
 // admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -69,6 +71,10 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     Route::post('/cart/add/{product}', [CartController::class, 'store'])->name('cart.add');
     Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{cartItem}', [CartController::class, 'destroy'])->name('cart.remove');
+
+    // wishlists
+    Route::post('/wishlist/add/{product}', [WishlistController::class, 'store'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{wishlistItem}', [WishlistController::class, 'remove'])->name('wishlist.remove');
 });
 
 // Route::middleware('auth')->group(function () {
@@ -77,4 +83,4 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

@@ -244,12 +244,6 @@
                                 <use href="#icon_view" />
                               </svg></span>
                           </a>
-                          <button class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
-                              xmlns="http://www.w3.org/2000/svg">
-                              <use href="#icon_heart" />
-                            </svg>
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -319,9 +313,8 @@
                   <div
                     class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
                     @php $inCart = $cartItems->get($product->id); @endphp
-                    @if ($product->inCart)
-                      <form method="POST" action="{{ route('customer.cart.remove', $product->inCart) }}"
-                        class="d-inline">
+                    @if ($inCart)
+                      <form method="POST" action="{{ route('customer.cart.remove', $inCart) }}" class="d-inline">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
                           title="Remove From Cart">Remove From Cart</button>
@@ -341,12 +334,6 @@
                           <use href="#icon_view" />
                         </svg></span>
                     </a>
-                    <button class="pc__btn-wl bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
-                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_heart" />
-                      </svg>
-                    </button>
                   </div>
                 </div>
               </div>
