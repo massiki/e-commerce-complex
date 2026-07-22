@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
 use App\Models\CartItem;
+use App\Models\Coupon;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,10 +22,35 @@ class CartController extends Controller
             return $price * $item->quantity;
         });
 
-        $vat = 0;
-        $total = $subtotal;
+        $vat = 1000;
+        $discount = 0;
+        $coupon = null;
 
-        return view('customer.carts', compact('cartItems', 'subtotal', 'vat', 'total'));
+        if (session()->has('coupon.id')) {
+            $coupon = Coupon::find(session('coupon.id'));
+
+            if ($coupon) {
+                if ($coupon->expired_at && $coupon->expired_at->isPast()) {
+                    session()->forget('coupon');
+                    $coupon = null;
+                } elseif ($subtotal < $coupon->minimum_purchase) {
+                    session()->forget('coupon');
+                    $coupon = null;
+                } else {
+                    if ($coupon->discount_type === 'fixed') {
+                        $discount = min($coupon->discount_value, $subtotal);
+                    } else {
+                        $discount = min($subtotal * $coupon->discount_value / 100, $subtotal);
+                    }
+                }
+            } else {
+                session()->forget('coupon');
+            }
+        }
+
+        $total = $subtotal - $discount + $vat;
+
+        return view('customer.carts', compact('cartItems', 'subtotal', 'vat', 'total', 'coupon', 'discount'));
     }
 
     public function store(Request $request, Product $product)
@@ -57,6 +83,7 @@ class CartController extends Controller
     {
         abort_if($cartItem->cart->user_id !== Auth::id(), 403);
         $cartItem->delete();
+
         return back()->with('success', 'Item removed from cart!');
     }
 }

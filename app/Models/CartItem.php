@@ -26,6 +26,7 @@ class CartItem extends Model
         $subTotal = $this->product?->discount
             ? $this->product->discount->value
             : $this->product->price;
+
         return ($subTotal ?? 0) * $this->quantity;
     }
 }

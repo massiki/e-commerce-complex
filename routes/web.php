@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
 use App\Http\Controllers\Customer\CartController;
+use App\Http\Controllers\Customer\CouponController as CustomerCouponController;
 use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\ProductController as CustomerProductController;
 use App\Http\Controllers\Customer\SearchController;
@@ -77,6 +78,10 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     // wishlists
     Route::post('/wishlist/add/{product}', [WishlistController::class, 'store'])->name('wishlist.add');
     Route::delete('/wishlist/remove/{wishlistItem}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+
+    // coupons
+    Route::post('/coupon/apply', [CustomerCouponController::class, 'apply'])->name('coupon.apply');
+    Route::delete('/coupon/remove', [CustomerCouponController::class, 'remove'])->name('coupon.remove');
 });
 
 // Route::middleware('auth')->group(function () {

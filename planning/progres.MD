@@ -1,6 +1,6 @@
 # Progress Proyek E-Commerce Complex
 
-**Terakhir diperbarui:** 21 Juli 2026
+**Terakhir diperbarui:** 22 Juli 2026
 
 ---
 
@@ -9,12 +9,12 @@
 | Komponen | Progress |
 |----------|----------|
 | Database Schema | ✅ ~100% (23 migrations) |
-| Models | ✅ ~100% (20 models: 8 attribute, 5 fillable, 7 tanpa) |
-| Controllers | ⬜ ~75% (26 total: 10 admin, 5 customer, 9 auth, 1 profile, 1 base) |
-| Views (Blade) | ⬜ ~65% (71 file: 21 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root) |
-| Routes | ⬜ ~75% (8 customer routes + 6 customer auth routes + ~30 admin routes) |
+| Models | ✅ ~100% (20 models: 3 `#[Fillable]`, 6 `#[Guarded]`, 4 `$fillable`, 1 `$guarded`, 6 tanpa) |
+| Controllers | ⬜ ~85% (27 total: 10 admin, 6 customer, 9 auth, 1 profile, 1 base) |
+| Views (Blade) | ⬜ ~65% (72 file: 22 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root) |
+| Routes | ⬜ ~80% (72 named routes: ~35 admin + 8 customer auth + 6 public + 9 auth + 14 guest) |
 | Tests | ⬜ ~10% (11 files, semua Breeze default) |
-| **Estimasi Keseluruhan** | **⬜ ~55%** |
+| **Estimasi Keseluruhan** | **⬜ ~60%** |
 
 ---
 
@@ -62,9 +62,10 @@
 ### Models (20 total)
 | Status | Models |
 |--------|--------|
-| ✅ PHP 8 Attributes (`#[Fillable]`/`#[Guarded]`) | User, Product, Cart, CartItem, Wishlist, WishlistItem, Review, Discount, ProductImage |
-| ✅ Traditional `$fillable`/`$guarded` | Brand, Category, Coupon, Slider, ActivityLog |
-| ⬜ Tanpa `$fillable` / `$guarded` (rentan mass assignment) | Order, OrderItem, CouponUsage, Address, Role, Notification |
+| ✅ PHP 8 Attributes (`#[Fillable]`) | Cart, CartItem, User |
+| ✅ PHP 8 Attributes (`#[Guarded]`) | Discount, Product, ProductImage, Review, Wishlist, WishlistItem |
+| ✅ Traditional `$fillable` | Brand, Category, Coupon, Slider, ActivityLog |
+| ⬜ Tanpa mass assignment protection | Address, CouponUsage, Notification, Order, OrderItem, Role |
 
 ### Admin CRUD — Complete (Controller + Views + Routes + ActivityLog)
 | Fitur | Controller | Index | Create | Edit | Store | Update | Destroy | ActivityLog |
@@ -94,6 +95,15 @@
 | **Cart Remove** | `CartController::destroy()` | `DELETE /customer/cart/remove/{cartItem}` | ✅ |
 | **Wishlist Add** | `WishlistController::store()` | `POST /customer/wishlist/add/{product}` | ✅ |
 | **Wishlist Remove** | `WishlistController::remove()` | `DELETE /customer/wishlist/remove/{wishlistItem}` | ✅ |
+| **Coupon Apply** | `CouponController::apply()` | `POST /customer/coupon/apply` | ✅ |
+| **Coupon Remove** | `CouponController::remove()` | `DELETE /customer/coupon/remove` | ✅ |
+
+### Customer Coupon System
+- `CouponController@apply()` — validasi kode, expired, minimum purchase, simpan ke session
+- `CouponController@remove()` — hapus coupon dari session
+- `CartController@index()` — validasi ulang expired & minimum purchase setiap load halaman
+- View: form APPLY/REMOVE kondisional, tampilkan discount row, flash messages error/sukses
+- Server-side session (bukan localStorage)
 
 ### Customer AJAX Search
 - `SearchController::search()` — return JSON produk by name `LIKE`
@@ -102,14 +112,22 @@
 - Tampilkan gambar + nama + harga di dropdown hasil pencarian
 - Override JavaScript di `layouts/app.blade.php` (setelah theme.js)
 
-### Routes (web.php)
-- **Customer public:** `/`, `/products`, `/products/search`, `/products/{product:slug}`, `/cart`, `/wishlist`
-- **Customer auth:** `/customer/dashboard`, cart CRUD, wishlist CRUD
-- **Admin** (middleware `auth+role:admin`, prefix `admin/`):
-  - 5 full resource routes: brands, categories, products, coupons, sliders (`except(['show'])`)
-  - 1 full resource: orders (hanya `index()` terisi)
+### Cart Improvements
+- Nested form bug fixed: form coupon dipisah dari form update cart
+- Coupon form menggunakan `route('customer.coupon.apply')` dengan method POST
+- Tombol UPDATE CART menggunakan atribut `form="cart-form"`
+
+### Routes (web.php) — 72 Named Routes
+- **Public/Guest (14):** `/`, register, login, password reset, `/products`, `/products/search`, `/products/{slug}`, `/cart`, `/wishlist`
+- **Auth (7):** email verification, password confirm, password update, logout
+- **Admin (~35):** prefix `admin/`, middleware `auth+role:admin`:
+  - 5 full resource: brands, categories, products, coupons, sliders
+  - 1 resource (partial): orders
   - 3 read-only: customers, reviews, activities
   - 1 setting: index + update
+  - 1 dashboard
+- **Customer auth (8):** prefix `customer/`, middleware `auth+role:customer`:
+  - dashboard, cart CRUD (3), wishlist CRUD (2), coupon apply/remove (2)
 
 ---
 
@@ -159,13 +177,15 @@
 | Issue | Detail | Severity |
 |-------|--------|----------|
 | Register tidak assign role | User baru daftar dapat `role_id = null` | 🔴 Tinggi |
-| 6 model tanpa `$fillable`/`$guarded` | Order, OrderItem, CouponUsage, Address, Role, Notification — rawan mass assignment | 🔴 Tinggi |
-| Route profile di-comment | `routes/web.php` line 82-86 | 🟡 Sedang |
+| 6 model tanpa mass assignment protection | Address, CouponUsage, Notification, Order, OrderItem, Role | 🔴 Tinggi |
+| Route profile di-comment | `routes/web.php` — profile edit/update/destroy tidak aktif | 🟡 Sedang |
 | Dashboard masih statis | Belum ada query real dari database | 🟡 Sedang |
 | Activity log manual | Belum pakai event/listener atau observer | 🟡 Sedang |
 | **OrderController hanya index()** | Full resource route, tapi show/create/store/edit/update/destroy belum diimplementasi | 🟡 Sedang |
 | **Customer dashboard controller** | 5 view sudah ada, controller + routes belum dibuat | 🟡 Sedang |
+| Admin Brand/Category/Product `show()` | Method `show()` ada tapi isinya kosong (stub) | 🟢 Ringan |
 | Inconsistency `Auth::user()->id` vs `Auth::id()` | Brand/Category/Slider pakai `Auth::user()->id`, Coupon/Product pakai `Auth::id()` | 🟢 Ringan |
+| Discount row duplicate `id="cart-vat"` | ID sama dengan VAT row, tidak ada JS yang pakai | 🟢 Ringan |
 
 ---
 
@@ -211,6 +231,7 @@
 - [x] Product Search (AJAX, debounce, live results)
 - [x] Wishlist (View, Add, Remove)
 - [x] Shopping Cart (View, Add, Update Qty, Remove)
+- [x] Coupon (Apply, Validate, Remove)
 - [/] Dashboard (Total Orders, Spending, Wishlist, Notifications, Payment History) — view statis
 - [ ] Address Management (Rumah/Kantor/Kos — Recipient, Phone, Province, City, District, Postal Code, Full Address)
 - [ ] Checkout (Midtrans & COD)
@@ -245,9 +266,9 @@
 ## Total File Summary
 
 ```
-app/Models/              → 20 models (6 tanpa fillable/guarded)
-app/Http/Controllers/    → 26 controllers (10 admin: 5 complete, 5 partial; 5 customer: all complete; 9 auth; 1 profile; 1 base)
-resources/views/         → 71 Blade files (21 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root)
+app/Models/              → 20 models (6 tanpa mass assignment protection)
+app/Http/Controllers/    → 27 controllers (10 admin: 5 complete, 5 partial; 6 customer: all complete; 9 auth; 1 profile; 1 base)
+resources/views/         → 72 Blade files (22 admin + 13 customer + 20 components + 5 layouts + 6 auth + 4 profile + 2 root)
 database/migrations/     → 23 migrations
 database/seeders/        → 1 seeder (DatabaseSeeder)
 database/factories/      → 6 factories (+ ReviewFactory)

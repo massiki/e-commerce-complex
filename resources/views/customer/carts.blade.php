@@ -37,7 +37,7 @@
       @else
         <div class="shopping-cart">
           <div class="cart-table__wrapper">
-            <form method="POST" action="{{ route('customer.cart.update') }}">
+            <form method="POST" action="{{ route('customer.cart.update') }}" id="cart-form">
               @csrf
               @method('PATCH')
               <table class="cart-table">
@@ -107,15 +107,40 @@
                   @endforeach
                 </tbody>
               </table>
-              <div class="cart-table-footer">
-                <form action="#" class="position-relative bg-body">
+            </form>
+            <div class="cart-table-footer">
+              @if ($coupon)
+                <form action="{{ route('customer.coupon.remove') }}" method="POST" class="position-relative bg-body"
+                  id="coupon-form">
+                  @csrf
+                  @method('delete')
+                  <input class="form-control" type="text" name="coupon_code" placeholder="Coupon Code"
+                    value="{{ $coupon->code }}">
+                  <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4" type="submit"
+                    value="REMOVE COUPON">
+                </form>
+              @else
+                <form action="{{ route('customer.coupon.apply') }}" method="POST" class="position-relative bg-body"
+                  id="coupon-form">
+                  @csrf
                   <input class="form-control" type="text" name="coupon_code" placeholder="Coupon Code">
                   <input class="btn-link fw-medium position-absolute top-0 end-0 h-100 px-4" type="submit"
                     value="APPLY COUPON">
                 </form>
-                <button type="submit" class="btn btn-light">UPDATE CART</button>
+              @endif
+              <div id="coupon-message" class="mt-2 small"></div>
+              <button type="submit" form="cart-form" class="btn btn-light">UPDATE CART</button>
+            </div>
+            @if (session('success'))
+              <div class="alert alert-success mt-2 mb-0">
+                {{ session('success') }}
               </div>
-            </form>
+            @endif
+            @if (session('error'))
+              <div class="alert alert-danger mt-2 mb-0">
+                {{ session('error') }}
+              </div>
+            @endif
           </div>
           @foreach ($cartItems as $item)
             <form action="{{ route('customer.cart.remove', $item) }}" method="POST"
@@ -128,43 +153,28 @@
             <div class="sticky-content">
               <div class="shopping-cart__totals">
                 <h3>Cart Totals</h3>
-                <table class="cart-totals">
+                <table class="cart-totals" id="cart-totals" data-subtotal="{{ $subtotal }}"
+                  data-vat="{{ $vat }}">
                   <tbody>
                     <tr>
                       <th>Subtotal</th>
-                      <td>Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
+                      <td id="cart-subtotal" class="text-end">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
                     </tr>
-                    <tr>
-                      <th>Shipping</th>
-                      <td>
-                        <div class="form-check">
-                          <input class="form-check-input form-check-input_fill" type="checkbox" value=""
-                            id="free_shipping">
-                          <label class="form-check-label" for="free_shipping">Free shipping</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input form-check-input_fill" type="checkbox" value=""
-                            id="flat_rate">
-                          <label class="form-check-label" for="flat_rate">Flat rate: Rp49.000</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input form-check-input_fill" type="checkbox" value=""
-                            id="local_pickup">
-                          <label class="form-check-label" for="local_pickup">Local pickup: Rp8.000</label>
-                        </div>
-                        <div>Shipping to AL.</div>
-                        <div>
-                          <a href="#" class="menu-link menu-link_us-s">CHANGE ADDRESS</a>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>VAT</th>
-                      <td>Rp{{ number_format($vat, 0, ',', '.') }}</td>
-                    </tr>
+                    @if ($vat)
+                      <tr>
+                        <th>VAT</th>
+                        <td id="cart-vat" class="text-end">Rp{{ number_format($vat, 0, ',', '.') }}</td>
+                      </tr>
+                    @endif
+                    @if ($discount)
+                      <tr>
+                        <th>Dicount</th>
+                        <td id="cart-vat" class="text-end">-Rp{{ number_format($discount, 0, ',', '.') }}</td>
+                      </tr>
+                    @endif
                     <tr>
                       <th>Total</th>
-                      <td>Rp{{ number_format($total, 0, ',', '.') }}</td>
+                      <td id="cart-total" class="text-end">Rp{{ number_format($total, 0, ',', '.') }}</td>
                     </tr>
                   </tbody>
                 </table>
