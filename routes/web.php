@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SliderController;
+use App\Http\Controllers\Customer\AddressController;
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\CouponController as CustomerCouponController;
 use App\Http\Controllers\Customer\HomeController;
@@ -82,6 +83,9 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     // coupons
     Route::post('/coupon/apply', [CustomerCouponController::class, 'apply'])->name('coupon.apply');
     Route::delete('/coupon/remove', [CustomerCouponController::class, 'remove'])->name('coupon.remove');
+
+    // addresses
+    Route::resource('addresses', AddressController::class)->except(['show'])->names('addresses');
 });
 
 // Route::middleware('auth')->group(function () {
@@ -90,4 +94,4 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 //     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 // });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
