@@ -65,7 +65,10 @@ class Product extends Model
 
     public function getDiscountPercentAttribute()
     {
-        if (!$this->discount || $this->price <= 0) return 0;
+        if (! $this->discount || $this->price <= 0) {
+            return 0;
+        }
+
         return 100 - round(($this->discount->value / $this->price) * 100);
     }
 
@@ -74,7 +77,7 @@ class Product extends Model
         $isFirstImage = $this->images->first()?->image;
 
         return $isFirstImage && Storage::disk('public')->exists($this->images->first()->image)
-            ? asset('storage/' . $isFirstImage)
+            ? asset('storage/'.$isFirstImage)
             : asset('image-600x400.png');
     }
 
@@ -83,7 +86,7 @@ class Product extends Model
         $isSecondImage = $this->images->skip(1)->first()?->image;
 
         return $isSecondImage && Storage::disk('public')->exists($isSecondImage)
-            ? asset('storage/' . $isSecondImage)
+            ? asset('storage/'.$isSecondImage)
             : null;
     }
 }
